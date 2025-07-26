@@ -45,6 +45,8 @@ try:
     body = driver.find_element(By.TAG_NAME, "body")
     body.send_keys(Keys.ESCAPE)
     time.sleep(3)
+    driver.execute_script("window.scrollBy(0, 500);")
+    time.sleep(3)
 
 except Exception as e:
     print("An error occurred:", e)
