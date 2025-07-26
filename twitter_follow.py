@@ -22,6 +22,8 @@ try:
 
     caret = element.find_element(By.XPATH, ".//button[@data-testid='caret']")
     print("Page is ready!", caret)
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", caret)
+    time.sleep(1)
     caret.click()
     time.sleep(5)
 
@@ -39,6 +41,10 @@ try:
 
     print("Follow button found:", follow_button.text)
     follow_button.click()
+
+    body = driver.find_element(By.TAG_NAME, "body")
+    body.send_keys(Keys.ESCAPE)
+    time.sleep(3)
 
 except Exception as e:
     print("An error occurred:", e)
