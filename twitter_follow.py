@@ -14,46 +14,48 @@ driver = webdriver.Chrome(options=options)
 
 
 driver.get("https://x.com/home")
-try:
 
-    element = WebDriverWait(driver, 60).until(
-        EC.presence_of_element_located((By.XPATH, "//div[@data-testid='cellInnerDiv']"))
-    )
+for i in range(5):
 
-    caret = element.find_element(By.XPATH, ".//button[@data-testid='caret']")
-    print("Page is ready!", caret)
-    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", caret)
-    time.sleep(1)
-    caret.click()
-    time.sleep(5)
+    try:
+
+        element = WebDriverWait(driver, 60).until(
+            EC.presence_of_element_located((By.XPATH, "//div[@data-testid='cellInnerDiv']"))
+        )
+
+        caret = element.find_element(By.XPATH, ".//button[@data-testid='caret']")
+        print("Page is ready!", caret)
+        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", caret)
+        time.sleep(1)
+        caret.click()
+        time.sleep(5)
 
 
-    dropdown = WebDriverWait(driver, 20).until(
-        lambda e: e.find_element(By.XPATH, ".//div[@data-testid='Dropdown']")
-    )
+        dropdown = WebDriverWait(driver, 20).until(
+            lambda e: e.find_element(By.XPATH, ".//div[@data-testid='Dropdown']")
+        )
 
-    print("Follow button found and clicked:", dropdown.text)
-    time.sleep(5)
+        print("Follow button found and clicked:", dropdown.text)
+        time.sleep(5)
 
-    follow_button = dropdown.find_element(
-        By.XPATH, ".//div[@role='menuitem'][contains(., 'Follow') and not(contains(., 'Following'))]"
-    )
+        follow_button = dropdown.find_element(
+            By.XPATH, ".//div[@role='menuitem'][contains(., 'Follow') and not(contains(., 'Following'))]"
+        )
 
-    print("Follow button found:", follow_button.text)
-    follow_button.click()
+        print("Follow button found:", follow_button.text)
+        follow_button.click()
 
-    body = driver.find_element(By.TAG_NAME, "body")
-    body.send_keys(Keys.ESCAPE)
-    time.sleep(3)
-    driver.execute_script("window.scrollBy(0, 500);")
-    time.sleep(3)
+        body = driver.find_element(By.TAG_NAME, "body")
+        body.send_keys(Keys.ESCAPE)
+        time.sleep(3)
+        driver.execute_script("window.scrollBy(0, 500);")
+        time.sleep(3)
 
-except Exception as e:
-    print("An error occurred:", e)
-    traceback.print_exc()
+    except Exception as e:
+        print("An error occurred:", e)
+        traceback.print_exc()
 
-finally:
-    driver.quit()
+    
 
 
 
