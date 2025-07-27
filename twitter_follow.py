@@ -12,7 +12,13 @@ options.add_experimental_option("debuggerAddress", "localhost:9222")
 
 driver = webdriver.Chrome(options=options)
 
+
 driver.get("https://x.com/home")
+
+
+
+    # driver.execute_script("window.scrollBy(0, 500);")
+    # time.sleep(3)
 
 try:
 
@@ -33,21 +39,43 @@ try:
             lambda e: e.find_element(By.XPATH, ".//div[@data-testid='Dropdown']")
         )
 
-        print("Follow button found and clicked:", dropdown.text)
+        print("Dropdown text:", dropdown.text)
         time.sleep(5)
 
-        follow_button = dropdown.find_element(
+        
+        menu_item = dropdown.find_element(
             By.XPATH, ".//div[@role='menuitem'][contains(., 'Follow') and not(contains(., 'Following'))]"
         )
 
-        print("Follow button found:", follow_button.text)
-        follow_button.click()
+        innerText = menu_item.text
+        print("Menu item text:", innerText)
 
-        body = driver.find_element(By.TAG_NAME, "body")
-        body.send_keys(Keys.ESCAPE)
-        time.sleep(3)
-        driver.execute_script("window.scrollBy(0, 500);")
-        time.sleep(3)
+        # if "Unfollow" in innerText:
+        #     print("Already following:", innerText)
+        #     body = driver.find_element(By.TAG_NAME, "body")
+        #     body.send_keys(Keys.ESCAPE)
+        #     time.sleep(3)
+        #     continue
+
+        if "Follow" in innerText:
+            follow_button = dropdown.find_element(
+                By.XPATH, ".//div[@role='menuitem'][contains(., 'Follow') and not(contains(., 'Following'))]"
+            )
+
+            print("Follow button found:", follow_button.text)
+            follow_button.click()
+
+            body = driver.find_element(By.TAG_NAME, "body")
+            body.send_keys(Keys.ESCAPE)
+            time.sleep(3)
+        else:
+            body = driver.find_element(By.TAG_NAME, "body")
+            body.send_keys(Keys.ESCAPE)
+            time.sleep(3)
+            print("No follow button found, skipping...")
+            continue
+        # driver.execute_script("window.scrollBy(0, 500);")
+        # time.sleep(3)
 
 except Exception as e:
     print("An error occurred:", e)
