@@ -12,17 +12,15 @@ options.add_experimental_option("debuggerAddress", "localhost:9222")
 
 driver = webdriver.Chrome(options=options)
 
-
 driver.get("https://x.com/home")
 
-for i in range(5):
+try:
 
-    try:
+    elements = WebDriverWait(driver, 60).until(
+        lambda e: e.find_elements(By.XPATH, "//div[@data-testid='cellInnerDiv']")
+    )
 
-        element = WebDriverWait(driver, 60).until(
-            EC.presence_of_element_located((By.XPATH, "//div[@data-testid='cellInnerDiv']"))
-        )
-
+    for element in elements:
         caret = element.find_element(By.XPATH, ".//button[@data-testid='caret']")
         print("Page is ready!", caret)
         driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", caret)
@@ -51,9 +49,9 @@ for i in range(5):
         driver.execute_script("window.scrollBy(0, 500);")
         time.sleep(3)
 
-    except Exception as e:
-        print("An error occurred:", e)
-        traceback.print_exc()
+except Exception as e:
+    print("An error occurred:", e)
+    traceback.print_exc()
 
     
 
