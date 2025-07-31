@@ -1,0 +1,212 @@
+{
+  "name": "Twitter Follow Automation",
+  "description": "Automatically follow users from Twitter home feed",
+  "browser_config": {
+    "debugger_address": "localhost:9222",
+    "chrome_options": [
+      "--remote-debugging-port=9222"
+    ]
+  },
+  "variables": {
+    "start_index": 0,
+    "max_scrolls": 2,
+    "count": 0,
+    "current_elements_count": 0
+  },
+  "execute_sequence": [
+    {
+      "action": "navigate",
+      "url": "https://x.com/home",
+      "wait_for_load": true
+    },
+    {
+      "action": "loop",
+      "condition": "max_scrolls > 0",
+      "steps": [
+        {
+          "action": "wait_for_elements",
+          "selector": {
+            "type": "xpath",
+            "value": "//div[@data-testid='cellInnerDiv']"
+          },
+          "timeout": 60000,
+          "store_in": "elements"
+        },
+        {
+          "action": "log",
+          "message": "Found {elements.length} elements. Processing from index {start_index} to {elements.length - 1}"
+        },
+        {
+          "action": "set_variable",
+          "name": "current_elements_count",
+          "value": "{elements.length}"
+        },
+        {
+          "action": "loop",
+          "condition": "start_index < current_elements_count",
+          "variable": "i",
+          "start": "{start_index}",
+          "end": "{current_elements_count}",
+          "steps": [
+            {
+              "action": "try_catch",
+              "try_steps": [
+                {
+                  "action": "find_element",
+                  "parent": "elements[{i}]",
+                  "selector": {
+                    "type": "xpath",
+                    "value": ".//button[@data-testid='caret']"
+                  },
+                  "store_in": "caret"
+                },
+                {
+                  "action": "log",
+                  "message": "Page is ready! Found caret button"
+                },
+                {
+                  "action": "scroll_into_view",
+                  "element": "{caret}",
+                  "block": "center"
+                },
+                {
+                  "action": "wait",
+                  "duration": 2000
+                },
+                {
+                  "action": "click",
+                  "element": "{caret}"
+                },
+                {
+                  "action": "wait",
+                  "duration": 2000
+                },
+                {
+                  "action": "wait_for_element",
+                  "selector": {
+                    "type": "xpath",
+                    "value": "//div[@data-testid='Dropdown']"
+                  },
+                  "timeout": 20000,
+                  "store_in": "dropdown"
+                },
+                {
+                  "action": "get_text",
+                  "element": "{dropdown}",
+                  "store_in": "dropdown_text"
+                },
+                {
+                  "action": "log",
+                  "message": "Dropdown text: {dropdown_text}"
+                },
+                {
+                  "action": "wait",
+                  "duration": 2000
+                },
+                {
+                  "action": "condition",
+                  "if": "!dropdown_text.includes('Follow')",
+                  "then": [
+                    {
+                      "action": "log",
+                      "message": "No follow button found in dropdown, skipping..."
+                    },
+                    {
+                      "action": "send_keys",
+                      "keys": "Escape"
+                    },
+                    {
+                      "action": "wait",
+                      "duration": 3000
+                    },
+                    {
+                      "action": "continue"
+                    }
+                  ]
+                },
+                {
+                  "action": "find_element",
+                  "parent": "{dropdown}",
+                  "selector": {
+                    "type": "xpath",
+                    "value": ".//div[@role='menuitem'][contains(., 'Follow') and not(contains(., 'Unfollow'))]"
+                  },
+                  "store_in": "follow_button"
+                },
+                {
+                  "action": "get_text",
+                  "element": "{follow_button}",
+                  "store_in": "follow_button_text"
+                },
+                {
+                  "action": "log",
+                  "message": "Follow button found: {follow_button_text}"
+                },
+                {
+                  "action": "click",
+                  "element": "{follow_button}"
+                },
+                {
+                  "action": "send_keys",
+                  "target": "body",
+                  "keys": "Escape"
+                },
+                {
+                  "action": "wait",
+                  "duration": 3000
+                },
+                {
+                  "action": "increment_variable",
+                  "name": "count"
+                }
+              ],
+              "catch_steps": [
+                {
+                  "action": "log",
+                  "message": "Skipping element due to error: {error}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "action": "decrement_variable",
+          "name": "max_scrolls"
+        },
+        {
+          "action": "set_variable",
+          "name": "start_index",
+          "value": "{current_elements_count}"
+        },
+        {
+          "action": "scroll_into_view",
+          "element": "elements[{current_elements_count - 1}]",
+          "block": "end"
+        },
+        {
+          "action": "log",
+          "message": "Scrolled down"
+        },
+        {
+          "action": "wait",
+          "duration": 3000
+        }
+      ]
+    },
+    {
+      "action": "log",
+      "message": "Total follow actions performed: {count}"
+    }
+  ],
+  "error_handling": {
+    "global_catch": {
+      "action": "log",
+      "message": "An error occurred: {error}"
+    }
+  },
+  "chrome_launch_command": {
+    "windows": "\"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" --remote-debugging-port=9222 --user-data-dir=\"C:\\Personal-space\\eternity\\chrome-profile\"",
+    "linux": "google-chrome --remote-debugging-port=9222 --user-data-dir=\"/tmp/chrome-profile\"",
+    "mac": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome --remote-debugging-port=9222 --user-data-dir=\"/tmp/chrome-profile\""
+  }
+}
